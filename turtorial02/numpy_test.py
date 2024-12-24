@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 from numpy import pi
+from numpy import newaxis
 
 #https://numpy.org/doc/2.1/user/quickstart.html
 
@@ -146,11 +147,89 @@ def mytest07():
     a = a.reshape(3, -1)
     print(a)
 
+# Stacking together different arrays
+def mytest08():
+    rg = np.random.default_rng(1)
+    a = np.floor(10 * rg.random((2, 2)))
+    b = np.floor(10 * rg.random((2, 2)))
+    c = np.vstack((a, b))
+    d = np.hstack((a, b))
+    #print(a, b, c, d)
+
+    c = np.column_stack((a, b))  # returns a 2D array
+    #print(c)
+
+    a = np.array([4., 2.])
+    b = np.array([3., 8.])
+    c = np.column_stack((a, b))  # returns a 2D array
+    d = np.hstack((a, b))        # the result is different
+    e = a[:, newaxis]            # view `a` as a 2D column vector
+    f = np.column_stack((a[:, newaxis], b[:, newaxis])) # the result is the same `c`
+    g = np.hstack((a[:, newaxis], b[:, newaxis]))  # the result is the same
+    #print(a, b, c, d, e, f, g)
+
+    a = np.r_[1:4, 0, 4]
+    print(a)
+
+# Splitting one array into serveral smaller ones
+def mytest09():
+    rg = np.random.default_rng(1)
+    a = np.floor(10 * rg.random((2, 12)))
+    b = np.hsplit(a, 3)
+    c = np.hsplit(a, (3, 4))
+    print(a, b, c)
+
+ 
+# Copies and views
+def myfunc02(x):
+   print(id(x)) 
+
+def mytest10():
+    a = np.arange(12).reshape((3, 4))
+    b = a
+    if b is a:
+        print(True)
+
+    print(id(a))    # id is a unique identifier of an object 
+    myfunc02(b)     # same
+
+# View or shallow copy
+def mytest11():
+    a = np.arange(12).reshape((3, 4))
+    c = a.view()
+    print(True if c is a else False)
+    print(True if c.base is a.base else False)
+    print(c, c.base)
+    print(True if c.flags.owndata else False)
+    c = c.reshape((2, 6))    # a's shape doesn't change
+    print(a.shape)
+    c[0, 4] = 1234           # a's data changes
+    print(a)
+
+    s = a[:, 1:3]
+    s[:] = 10
+    print(a)                 # change
+
+# Deep copy 
+def mytest12():
+    a = np.arange(12).reshape((3, 4))
+    d = a.copy()
+    print(True if d is a else False)
+    print(True if d.base is a.base else False)
+    print(a, a.base, d, d.base)
+    d[0, 0] = 9999
+    print(a)                # no change
+
+    a = np.arange(int(1e8))
+    print(a)                # no change
+    b = a[:100].copy()
+    del a  # the memory of ``a`` can be released.
+    print(b)                # no change
 
 
 #----------------------------------------main----------------------------------------#
 def main():
-    mytest07()
+    mytest12()
 
 if __name__ == '__main__':
     main()
